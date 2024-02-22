@@ -24,25 +24,21 @@ void MCTSAgent::execute(std::shared_ptr<IState> ARootState) {
     while (i<=m_max_iterations && elapsed.count() <= m_max_seconds){
 
         // we explore/exploit the existing tree to find a node to work on
-        auto [tree_i,reward_i] = selection_policy(m_tree);
-
-        expand_policy(tree_i);
+        auto tree_i = select(m_tree);
+        if(tree_i->is_terminal())
+            std::cout<<i<<": "<<tree_i->is_terminal()<<std::endl;
+        auto child_i =expand(tree_i);
         // we simulate an execution from the selected node
-        auto reward = simulation_policy(tree_i);
+        auto reward = simulate(child_i);
 
         //we backpropagate the obtained reward in the tree
-        back_propagate(tree_i,reward);
+        back_propagate(child_i,reward);
         //increase loop counters
         i++;
         elapsed= std::chrono::steady_clock::now()-time0;
     }
     m_nb_iterations=i;
     m_nb_seconds =elapsed.count();
-}
-/*---------------------------------------------------------------------------*/
-void MCTSAgent::expand_policy(std::shared_ptr<MCTSTree> ANode) {
-    //auto prev_node = ANode->get_parent();
-    ANode->expand_children();
 }
 /*---------------------------------------------------------------------------*/
 std::shared_ptr<MCTSTree> MCTSAgent::make_tree(const std::shared_ptr<IState> AState,
@@ -59,7 +55,24 @@ std::shared_ptr<IState> MCTSAgent::get_best_solution() {
     return current_node->get_state();
 }
 /*---------------------------------------------------------------------------*/
-double MCTSAgent::simulation_policy(std::shared_ptr<MCTSTree> ANode) {
+std::shared_ptr<MCTSTree>
+MCTSAgent::select(std::shared_ptr<MCTSTree> ANode) {
+    auto current_node = ANode;
+
+    while (current_node->is_fully_expanded() && !current_node->is_terminal()){
+        auto action = current_node->select_action_UCT();
+        //action already done, the child exists
+        current_node = current_node->get_child(action);;
+    }
+    //We have reached a terminal node here
+    return  current_node;
+}
+/*---------------------------------------------------------------------------*/
+std::shared_ptr<MCTSTree> MCTSAgent::expand(std::shared_ptr<MCTSTree> ANode) {
+    return ANode->expand();
+}
+/*---------------------------------------------------------------------------*/
+double MCTSAgent::simulate(std::shared_ptr<MCTSTree> ANode) {
     auto current_node = ANode;
     auto current_state = current_node->get_state();
     double reward = 0;
@@ -69,50 +82,13 @@ double MCTSAgent::simulation_policy(std::shared_ptr<MCTSTree> ANode) {
         reward += m_reward_function->compute(current_state,action,next_state);
         //we are in simulation mode, so the next node does not exist
         auto child_node = make_tree(next_state,
-                                        current_node,
-                                        action);
+                                    current_node,
+                                    action);
         current_node->add_child(child_node);
         current_node = child_node;
         current_state = current_node->get_state();
     }
     return reward;
-}
-/*---------------------------------------------------------------------------*/
-std::pair<std::shared_ptr<MCTSTree>, double>
-MCTSAgent::selection_policy(std::shared_ptr<MCTSTree> ANode) {
-    double reward = 0;
-    auto current_node = ANode;
-    auto current_state = current_node->get_state();
-
-    while (!current_state->is_terminal()){
-        auto action = current_node->select_action();
-        if(action== nullptr){
-            //no child, we need to perform simulation
-            return std::make_pair(current_node,reward);
-        }
-        auto next_node = current_node->get_child(action);
-
-        auto next_state = next_node->get_state();
-        reward += m_reward_function->compute(current_state,action,next_state);
-      /*  // Is it the first observation of the transition from current_state to
-        // next_state ?
-        if(next_node== nullptr){
-            //first time, we apply this action from this node
-            //we create the child node
-            auto child_node = make_tree(next_state,
-                                        current_node,
-                                        action);
-            //we add it to the current node
-            current_node->add_child(child_node);
-            return std::make_pair(child_node,reward);
-        }
-        */
-      //action already done, the child exists
-        current_node = next_node;
-        current_state = current_node->get_state();
-    }
-    //We have reached a terminal node here
-    return  std::make_pair(current_node,reward);
 }
 /*---------------------------------------------------------------------------*/
 void MCTSAgent::back_propagate(std::shared_ptr<MCTSTree> ANode, double AReward) {

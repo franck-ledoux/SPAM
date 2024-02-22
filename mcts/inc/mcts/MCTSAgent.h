@@ -12,7 +12,7 @@ class MCTSAgent {
 public:
 
     MCTSAgent(const std::shared_ptr<IRewardFunction> ARewardFunction,
-              const int AMaxIterations=10000, const int AMaxSeconds=600);
+              const int AMaxIterations=100000, const int AMaxSeconds=600);
     virtual ~MCTSAgent();
     void execute(std::shared_ptr<IState> ARootState);
     std::shared_ptr<IState> get_best_solution();
@@ -29,9 +29,9 @@ private:
      * @param[in] ANode the node we start the selectio from
      * @return the selected node and the reward associated to this node
      */
-    std::pair<std::shared_ptr<MCTSTree>, double> selection_policy(std::shared_ptr<MCTSTree> ANode);
-    double simulation_policy(std::shared_ptr<MCTSTree>);
-    void expand_policy(std::shared_ptr<MCTSTree> ANode);
+    std::shared_ptr<MCTSTree> select(std::shared_ptr<MCTSTree> ANode);
+    double simulate(std::shared_ptr<MCTSTree> ANode);
+    std::shared_ptr<MCTSTree> expand(std::shared_ptr<MCTSTree> ANode);
     void back_propagate(std::shared_ptr<MCTSTree> ANode, double AReward);
 private:
     std::shared_ptr<MCTSTree> m_tree;

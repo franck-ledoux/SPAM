@@ -46,7 +46,7 @@ public:
      */
     void add_child(const std::shared_ptr<MCTSTree> AChild);
 
-    void expand_children();
+    std::shared_ptr<MCTSTree>  expand();
     /** @return true if it doesn't remain actions to perform for generating child,
      * false otherwise
      */
@@ -61,7 +61,7 @@ public:
      *        based on the exploration/exploitation principle (UCT criterion here)
        * @return the selected action
        */
-    std::shared_ptr<IAction> select_action(double AC=1.41) const;
+    std::shared_ptr<IAction> select_action_UCT(double AC=1.41) const;
     /**@brief Among all the possible action to try, provide one to apply randomly
      * @return the selected action
      */

@@ -81,42 +81,48 @@ get_child(const std::shared_ptr<IAction> AAction) {
     return nullptr;
 }
 /*---------------------------------------------------------------------------*/
-void MCTSTree::expand_children()  {
+std::shared_ptr<MCTSTree>  MCTSTree::expand()  {
+    if (is_terminal())
+        return std::make_shared<MCTSTree>(*this);
     auto action = random_action();
-    if(action!= nullptr) {
-        auto next_state = m_state->apply(action);
-        add_child(std::make_shared<MCTSTree>(next_state, std::make_shared<MCTSTree>(*this), action));
-    }
+    if(action== nullptr)
+        throw std::exception();
+    auto next_state = m_state->apply(action);
+    auto child = std::make_shared<MCTSTree>(next_state, std::make_shared<MCTSTree>(*this), action) ;
+    add_child(child);
+    return child;
 }
 /*---------------------------------------------------------------------------*/
 const std::shared_ptr<MCTSTree> MCTSTree::get_parent() const {
     return  m_parent;
 }
 /*---------------------------------------------------------------------------*/
-std::shared_ptr<IAction> MCTSTree::select_action(double AC) const {
+std::shared_ptr<IAction> MCTSTree::select_action_UCT(double AC) const {
     if (m_children.empty())
-        return nullptr;
+        throw std::exception();
 
     if (m_children.size() == 1)
         return m_children[0]->get_action();
 
-    double uct=0, max = -1;
-    std::shared_ptr<MCTSTree> argmax;// = std::make_shared<MCTSTree>(nullptr);
-    for (auto  child: m_children) {
-        double winrate = child->cumulative_reward / ((double) child->nb_simulations+1);
-        if (AC> 0) {
-            uct = winrate +
-                  AC * sqrt(log((double) this->nb_simulations) / ((double) child->nb_simulations+1));
+    auto ns = nb_simulations;
+    auto num = 2*log(ns);
+
+    auto argmax_id =0;
+    auto qsa = m_children[0]->cumulative_reward;
+    double nsa = (double)(m_children[0]->nb_simulations);
+    auto max = qsa+2*AC* sqrt(num/nsa);
+
+    for (auto  i=1; i<m_children.size();i++) {
+        auto qsa = m_children[i]->cumulative_reward;
+        double nsa = (double)(m_children[i]->nb_simulations);
+        auto value = qsa+2*AC* sqrt(num/nsa);
+        if(value>max){
+            argmax_id=i;
+            max=value;
         }
-        else {
-            uct = winrate;
-        }
-        if (uct > max) {
-            max = uct;
-            argmax = child;
-        }
+
     }
-    return argmax->get_action();
+    return m_children[argmax_id]->get_action();
 }
 /*---------------------------------------------------------------------------*/
 std::shared_ptr<IAction> MCTSTree::random_action() const {
