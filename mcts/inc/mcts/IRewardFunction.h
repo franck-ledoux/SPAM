@@ -16,9 +16,9 @@ struct IRewardFunction {
      * @param AStateTo   destination state
      * @return a double value comprised in [0,1]
      */
-    virtual double compute(const std::shared_ptr<IState> AStateFrom,
-                           const std::shared_ptr<IAction> AAction,
-                           const std::shared_ptr<IState> AStateTo) const = 0;
+    virtual double compute(const IState* AStateFrom,
+                           const IAction* AAction,
+                           const IState* AStateTo) const = 0;
 };
 /*---------------------------------------------------------------------------*/
 #endif //MATCHING_IREWARDFUNCTION_H

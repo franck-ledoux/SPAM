@@ -4,7 +4,7 @@
 #include "mcts/MCTSAgent.h"
 /*---------------------------------------------------------------------------*/
 int main() {
-    std::shared_ptr<TakuzuState> s = std::make_shared<TakuzuState>();
+    TakuzuState* s = new TakuzuState();
     s->board[0][0]='0';
     s->board[0][2]='1';
     s->board[0][3]='1';
@@ -13,13 +13,12 @@ int main() {
     s->board[3][0]='0';
     s->board[3][2]='1';
     std::cout<<"Grid:"<<std::endl<<*s<<std::endl;
-    auto actions = s->get_actions_to_try();
 
-    auto reward_function = std::make_shared<TakuzuRewardFunction>();
-    MCTSAgent agent(reward_function);
+    TakuzuRewardFunction reward_function;
+    MCTSAgent agent(&reward_function,1000000);
     agent.execute(s);
-    std::cout<<"Nb runs: "<<agent.get_nb_iterations()<<std::endl;
-    std::cout<<"Timing : "<<agent.get_nb_seconds()<<" s."<<std::endl;
+    std::cout<<"Nb runs: "<<agent.get_nb_iterations()-1,
+    std::cout<<", timing: "<<agent.get_nb_seconds()<<" s."<<std::endl;
     std::cout<<"Best solution:"<<std::endl;
-    std::cout<<*std::dynamic_pointer_cast<TakuzuState>(agent.get_best_solution())<<std::endl;
+    std::cout<<*dynamic_cast<const TakuzuState*>(agent.get_best_solution())<<std::endl;
 }

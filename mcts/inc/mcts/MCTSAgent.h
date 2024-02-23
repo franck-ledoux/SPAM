@@ -2,7 +2,6 @@
 #ifndef MATCHING_MCTSAGENT_H
 #define MATCHING_MCTSAGENT_H
 /*---------------------------------------------------------------------------*/
-#include <memory>
 #include "mcts/IState.h"
 #include "mcts/IAction.h"
 #include "mcts/IRewardFunction.h"
@@ -11,17 +10,14 @@
 class MCTSAgent {
 public:
 
-    MCTSAgent(const std::shared_ptr<IRewardFunction> ARewardFunction,
-              const int AMaxIterations=100000, const int AMaxSeconds=600);
+    MCTSAgent(const IRewardFunction* ARewardFunction,
+              const int AMaxIterations=1000000, const int AMaxSeconds=600);
     virtual ~MCTSAgent();
-    void execute(std::shared_ptr<IState> ARootState);
-    std::shared_ptr<IState> get_best_solution();
+    void execute(IState* ARootState);
+    const IState* get_best_solution();
     int get_nb_iterations() const {return m_nb_iterations;}
     int get_nb_seconds() const {return m_nb_seconds;}
 private:
-    std::shared_ptr<MCTSTree> make_tree(const std::shared_ptr<IState> AState,
-                                        const std::shared_ptr<MCTSTree> AParent= nullptr,
-                                        const std::shared_ptr<IAction> AAction= nullptr);
 
     /** Selection induces a decision policy, known as the tree policy, to navigate
      * through the existing decision tree, attempting to strike a balance between
@@ -29,13 +25,13 @@ private:
      * @param[in] ANode the node we start the selectio from
      * @return the selected node and the reward associated to this node
      */
-    std::shared_ptr<MCTSTree> select(std::shared_ptr<MCTSTree> ANode);
-    double simulate(std::shared_ptr<MCTSTree> ANode);
-    std::shared_ptr<MCTSTree> expand(std::shared_ptr<MCTSTree> ANode);
-    void back_propagate(std::shared_ptr<MCTSTree> ANode, double AReward);
+    MCTSTree* select(MCTSTree* ANode);
+    double simulate(MCTSTree* ANode);
+    MCTSTree* expand(MCTSTree* ANode);
+    void back_propagate(MCTSTree* ANode, double AReward);
 private:
-    std::shared_ptr<MCTSTree> m_tree;
-    const std::shared_ptr<IRewardFunction> m_reward_function;
+    MCTSTree* m_tree;
+    const IRewardFunction* m_reward_function;
     const int m_max_iterations;
     const int m_max_seconds;
     int m_nb_iterations;
