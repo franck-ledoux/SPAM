@@ -77,9 +77,9 @@ private:
     /** children nodes, that are potentially empty. When a children node
      * is generated, it means that an action is remove from the m_untried_actions
      * collection **/
-    std::vector<std::shared_ptr<MCTSTree> > m_children;
+    std::vector<MCTSTree*> m_children;
 
-    std::vector<std::shared_ptr<IAction>> m_actions;
+    std::vector<IAction*> m_actions;
 };
 /*---------------------------------------------------------------------------*/
 #endif //MATCHING_MCTSTREE_H

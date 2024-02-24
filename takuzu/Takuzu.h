@@ -31,7 +31,7 @@ public:
     TakuzuState();
     TakuzuState(const TakuzuState& AState);
 
-    std::vector<std::shared_ptr<IAction> > get_actions() const override;
+    std::vector<IAction*> get_actions() const override;
 
     /**@brief Computes the state reach from the current one when applying @p AAction
      * @param AAction the action to apply

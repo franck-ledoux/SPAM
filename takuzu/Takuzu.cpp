@@ -18,14 +18,14 @@ TakuzuState::TakuzuState(const TakuzuState &AState) {
     }
 }
 /*---------------------------------------------------------------------------*/
-std::vector<std::shared_ptr<IAction> > TakuzuState::get_actions() const
+std::vector<IAction*> TakuzuState::get_actions() const
 {
-    std::vector<std::shared_ptr<IAction> > actions;
+    std::vector<IAction*> actions;
     for (auto i = 0; i < 4; i++) {
         for (auto j = 0; j < 4; j++) {
             if(board[i][j]=='.'){
-                actions.push_back(std::make_shared<TakuzuAction>(i,j,'0'));
-                actions.push_back(std::make_shared<TakuzuAction>(i,j,'1'));
+                actions.push_back(new TakuzuAction(i,j,'0'));
+                actions.push_back(new TakuzuAction(i,j,'1'));
             }
         }
     }

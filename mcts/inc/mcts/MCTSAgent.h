@@ -24,7 +24,7 @@ public:
     * @param[in] AState stage we generate an action from
     * @return the generated action
     */
-    std::shared_ptr<IAction> get_random_action(const IState* AState) const;
+    IAction* get_random_action(const IState* AState) const;
 
 private:
 

@@ -83,7 +83,7 @@ double MCTSAgent::simulate(MCTSTree* ANode) {
         for (int d = 0; d < m_simulation_depth; d++) {
             if (!state->is_terminal()) {
                 auto a = get_random_action(state);
-                state = state->apply(a.get());
+                state = state->apply(a);
             }
         }
     }
@@ -99,7 +99,7 @@ void MCTSAgent::back_propagate(MCTSTree* ANode, double AReward) {
     }
 }
 /*---------------------------------------------------------------------------*/
-std::shared_ptr<IAction> MCTSAgent::get_random_action(const IState* AState) const {
+IAction* MCTSAgent::get_random_action(const IState* AState) const {
     /** selects an action among the untried ones */
     auto actions = AState->get_actions();
     //randomly pick an action

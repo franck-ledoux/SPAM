@@ -47,7 +47,7 @@ MCTSTree* MCTSTree::get_most_visited_child() const {
     for(auto c: m_children) {
         if(c->number_visits > most_visits) {
             most_visits = c->number_visits;
-            best_node = c.get();
+            best_node = c;
         }
     }
     return best_node;
@@ -57,7 +57,7 @@ MCTSTree* MCTSTree::get_most_visited_child() const {
 }
 /*---------------------------------------------------------------------------*/
 MCTSTree* MCTSTree::get_child(const int AI) const {
-    return m_children[AI].get();
+    return m_children[AI];
 }
 /*---------------------------------------------------------------------------*/
 bool MCTSTree::has_children() const {
@@ -84,7 +84,7 @@ MCTSTree*  MCTSTree::expand()  {
     }
 
     // add the next action in queue as a child
-    return add_child_with_action(m_actions[m_children.size()].get() );
+    return add_child_with_action(m_actions[m_children.size()] );
 
 }
 
@@ -96,7 +96,7 @@ MCTSTree*  MCTSTree::add_child_with_action( IAction* AAction) {
 
     MCTSTree* child_node = new MCTSTree(next_state, this, AAction);
 
-    m_children.push_back(std::shared_ptr<MCTSTree>(child_node));
+    m_children.push_back(child_node);
 
     return child_node;
 
@@ -120,7 +120,7 @@ MCTSTree* MCTSTree::get_best_uct_child(double AC) const {
 
         if(uct_score > best_utc_score) {
             best_utc_score = uct_score;
-            best_node = child.get();
+            best_node = child;
         }
     }
 
