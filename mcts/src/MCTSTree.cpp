@@ -4,28 +4,17 @@
 #include <iostream>
 #include <cfloat>
 #include <limits>
+#include <random>
 /*---------------------------------------------------------------------------*/
 MCTSTree::
 MCTSTree(const IState *AState, MCTSTree *AParent, IAction *AAction)
 : m_state(AState), m_parent(AParent), m_action(AAction),
-cumulative_reward(0), nb_simulations(0), m_untried_actions(m_state->get_actions_to_try())
-{}
+  cumulative_reward(0), number_visits(0)
+{
+    m_actions =m_state->get_actions();
+}
 /*---------------------------------------------------------------------------*/
 MCTSTree::~MCTSTree() {
-    if(m_state!= nullptr)
-        delete m_state;
-
-    if(m_action!= nullptr)
-        delete m_action;
-
-    for(auto &c : m_children){
-        if(c!= nullptr)
-            delete c;
-    }
-    for(auto &a : m_untried_actions){
-        if(a!= nullptr)
-            delete a;
-    }
 }
 /*---------------------------------------------------------------------------*/
 const IState* MCTSTree::get_state() const {
@@ -45,105 +34,99 @@ bool MCTSTree::is_terminal() const {
 }
 /*---------------------------------------------------------------------------*/
 bool MCTSTree::is_fully_expanded() const {
-    return  m_untried_actions.empty();
+    return m_children.empty() == false &&
+           m_children.size() == m_actions.size();
 }
+
 /*---------------------------------------------------------------------------*/
 MCTSTree* MCTSTree::get_most_visited_child() const {
-    if(m_children.empty())
-        return nullptr;
+    int most_visits = -1;
+    MCTSTree* best_node = nullptr;
 
-    MCTSTree* most_visited = m_children[0];
-    for(auto c:m_children){
-        if (c->nb_simulations>most_visited->nb_simulations){
-            most_visited=c;
+    // iterate all  children and find most visited
+    for(auto c: m_children) {
+        if(c->number_visits > most_visits) {
+            most_visits = c->number_visits;
+            best_node = c.get();
         }
     }
-    std::cout<<"Most visited: "<<most_visited->nb_simulations<<std::endl;
-    return  most_visited;
-}
-/*---------------------------------------------------------------------------*/
-void MCTSTree::add_child(MCTSTree* AChild) {
-    m_children.push_back(AChild);
-    //and we remove the action that lead to create this child from the list of
-    //actions
-    auto a = AChild->get_action();
-    int a_index = -1;
-    for(auto i=0; i<m_untried_actions.size() && a_index==-1;i++){
-        if(m_untried_actions[i]==a)
-            a_index = i;
-    }
-    //we remove the action now
-    if(a_index!=m_untried_actions.size()-1){
-        m_untried_actions[a_index]= m_untried_actions.back();
+    return best_node;
 
-    }
-    m_untried_actions.pop_back();
-}
 
-/*---------------------------------------------------------------------------*/
-void MCTSTree::remove_children() {
-    for(auto c:m_children){
-        delete c;
-    }
+
 }
 /*---------------------------------------------------------------------------*/
-MCTSTree* MCTSTree::get_child(const IAction* AAction) const {
-    for(auto c:m_children) {
-        if (c->get_action() == AAction)
-            return c;
-    }
-    return nullptr;
+MCTSTree* MCTSTree::get_child(const int AI) const {
+    return m_children[AI].get();
+}
+/*---------------------------------------------------------------------------*/
+bool MCTSTree::has_children() const {
+    return !m_children.empty();
 }
 /*---------------------------------------------------------------------------*/
 MCTSTree*  MCTSTree::expand()  {
+    // sanity check that we're not already fully expanded
+    if(is_fully_expanded())
+        return nullptr;
+
     if (is_terminal())
         return this;
-    auto action = random_action();
-    if(action== nullptr)
-        throw std::exception();
-    auto next_state = m_state->apply(action);
-    auto child =  new MCTSTree(next_state);
-    add_child(child);
-    return child;
+
+    // if this is the first expansion and we haven't yet got all of the possible actions
+    if(m_actions.empty()) {
+        // retrieve list of actions from the state
+        m_actions = m_state->get_actions();
+
+        // randomize the order
+        std::shuffle(m_actions.begin(),
+                     m_actions.end(),
+                     std::mt19937(std::random_device()()));
+    }
+
+    // add the next action in queue as a child
+    return add_child_with_action(m_actions[m_children.size()].get() );
+
+}
+
+//--------------------------------------------------------------
+// create a clone of the current state, apply action, and add as child
+MCTSTree*  MCTSTree::add_child_with_action( IAction* AAction) {
+    // create a new TreeNode with the same state (will get cloned) as this TreeNode
+    auto next_state = m_state->apply(AAction);
+
+    MCTSTree* child_node = new MCTSTree(next_state, this, AAction);
+
+    m_children.push_back(std::shared_ptr<MCTSTree>(child_node));
+
+    return child_node;
+
 }
 /*---------------------------------------------------------------------------*/
-const IAction* MCTSTree::select_action_UCT(double AC) const {
+MCTSTree* MCTSTree::get_best_uct_child(double AC) const {
     // sanity check
-    //TODO it should be fully expanded in practice
- //   if(!node->is_fully_expanded()) return NULL;
-
-    if (m_children.empty())
-        throw std::exception();
-
-    if (m_children.size() == 1)
-        return m_children[0]->get_action();
+    if(!is_fully_expanded())
+        return nullptr;
 
     float best_utc_score = -std::numeric_limits<float>::max();
-    MCTSTree* best_node = NULL;
+    MCTSTree* best_node = nullptr;
 
     // iterate all immediate children and find best UTC score
     int num_children = m_children.size();
     for(auto i = 0; i < num_children; i++) {
         auto child = m_children[i];
-        float uct_exploitation = (float)child->cumulative_reward / (child->nb_simulations + FLT_EPSILON);
-        float uct_exploration = sqrt( log((float)this->nb_simulations + 1) / (child->nb_simulations + FLT_EPSILON) );
+        float uct_exploitation = (float)child->cumulative_reward / (child->number_visits + FLT_EPSILON);
+        float uct_exploration = sqrt(log((float)this->number_visits + 1) / (child->number_visits + FLT_EPSILON) );
         float uct_score = uct_exploitation + AC * uct_exploration;
 
         if(uct_score > best_utc_score) {
             best_utc_score = uct_score;
-            best_node = child;
+            best_node = child.get();
         }
     }
 
-    return best_node->get_action();
+    if(best_node== nullptr)
+      std::cout<<"stop"<<std::endl;
 
-}
-/*---------------------------------------------------------------------------*/
-IAction* MCTSTree::random_action() const {
-    /** selects an action among the untried ones */
-    if (m_untried_actions.empty())
-        return nullptr;
+    return best_node;
 
-    //randomly pick an action
-    return m_untried_actions[std::rand()%m_untried_actions.size()];
 }

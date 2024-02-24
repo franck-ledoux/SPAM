@@ -11,12 +11,21 @@ class MCTSAgent {
 public:
 
     MCTSAgent(const IRewardFunction* ARewardFunction,
-              const int AMaxIterations=1000000, const int AMaxSeconds=600);
+              const int AMaxIterations=100000, const int AMaxSeconds=600,
+              const int AMaxSimulationDepth=100);
     virtual ~MCTSAgent();
-    void execute(IState* ARootState);
+    void run(IState* ARootState);
     const IState* get_best_solution();
     int get_nb_iterations() const {return m_nb_iterations;}
     int get_nb_seconds() const {return m_nb_seconds;}
+
+    /**@brief Among all the possible action generated from
+    * @p AState, pick one randomly
+    * @param[in] AState stage we generate an action from
+    * @return the generated action
+    */
+    std::shared_ptr<IAction> get_random_action(const IState* AState) const;
+
 private:
 
     /** Selection induces a decision policy, known as the tree policy, to navigate
@@ -36,6 +45,7 @@ private:
     const int m_max_seconds;
     int m_nb_iterations;
     int m_nb_seconds;
+    int m_simulation_depth;
 };
 
 

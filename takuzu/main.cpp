@@ -16,7 +16,7 @@ int main() {
 
     TakuzuRewardFunction reward_function;
     MCTSAgent agent(&reward_function,1000000);
-    agent.execute(s);
+    agent.run(s);
     std::cout<<"Nb runs: "<<agent.get_nb_iterations()-1,
     std::cout<<", timing: "<<agent.get_nb_seconds()<<" s."<<std::endl;
     std::cout<<"Best solution:"<<std::endl;

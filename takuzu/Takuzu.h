@@ -31,7 +31,7 @@ public:
     TakuzuState();
     TakuzuState(const TakuzuState& AState);
 
-    std::vector<IAction* > get_actions_to_try() const override;
+    std::vector<std::shared_ptr<IAction> > get_actions() const override;
 
     /**@brief Computes the state reach from the current one when applying @p AAction
      * @param AAction the action to apply
@@ -39,7 +39,7 @@ public:
      */
     const IState* apply(const IAction* AAction) const override;
 
-    virtual bool is_terminal() const;
+    bool is_terminal() const override;
     bool  lost() const;
     bool  win() const;
 
@@ -49,17 +49,8 @@ public:
 /*---------------------------------------------------------------------------*/
 struct TakuzuRewardFunction: public IRewardFunction{
 
-    /**@brief this function must give the expected reward when you goes from
-     * state @p AStateFrom to state @p AStateTo using action @p AAction
-     *
-     * @param AStateFrom origin state
-     * @param AAction    transition action
-     * @param AStateTo   destination state
-     * @return a double value comprised in [-1,0,1]
-     */
-    double compute(const IState* AStateFrom,
-                   const IAction* AAction,
-                   const IState* AStateTo) const override;
+
+    double evaluate(const IState* AState) const override;
 
 };
 /*---------------------------------------------------------------------------*/
