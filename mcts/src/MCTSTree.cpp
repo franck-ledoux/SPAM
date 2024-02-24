@@ -1,27 +1,31 @@
 /*---------------------------------------------------------------------------*/
-#include "mcts/MCTSTree.h"
 #include <cmath>
 #include <iostream>
 #include <cfloat>
 #include <limits>
 #include <random>
+#include <algorithm>
+#include <memory>
 /*---------------------------------------------------------------------------*/
-MCTSTree::
-MCTSTree(const IState *AState, MCTSTree *AParent, IAction *AAction)
-: m_state(AState), m_parent(AParent), m_action(AAction),
+#include "mcts/MCTSTree.h"
+/*---------------------------------------------------------------------------*/
+MCTSTree::MCTSTree(std::shared_ptr<IState> AState, std::shared_ptr<IAction> AAction, MCTSTree *AParent)
+: m_state(AState), m_action(AAction), m_parent(AParent),
   cumulative_reward(0), number_visits(0)
 {
     m_actions =m_state->get_actions();
 }
 /*---------------------------------------------------------------------------*/
 MCTSTree::~MCTSTree() {
+    for(auto c: m_children)
+        delete c;
 }
 /*---------------------------------------------------------------------------*/
-const IState* MCTSTree::get_state() const {
+std::shared_ptr<IState> MCTSTree::get_state() const {
     return m_state;
 }
 /*---------------------------------------------------------------------------*/
-IAction* MCTSTree::get_action() const {
+std::shared_ptr<IAction> MCTSTree::get_action() const {
     return m_action;
 }
 /*---------------------------------------------------------------------------*/
@@ -84,17 +88,17 @@ MCTSTree*  MCTSTree::expand()  {
     }
 
     // add the next action in queue as a child
-    return add_child_with_action(m_actions[m_children.size()] );
+    return add_child_with_action(m_actions[m_children.size()]);
 
 }
 
 //--------------------------------------------------------------
 // create a clone of the current state, apply action, and add as child
-MCTSTree*  MCTSTree::add_child_with_action( IAction* AAction) {
+MCTSTree*  MCTSTree::add_child_with_action(std::shared_ptr<IAction> AAction) {
     // create a new TreeNode with the same state (will get cloned) as this TreeNode
     auto next_state = m_state->apply(AAction);
 
-    MCTSTree* child_node = new MCTSTree(next_state, this, AAction);
+    MCTSTree* child_node = new MCTSTree(next_state, AAction, this);
 
     m_children.push_back(child_node);
 
@@ -123,9 +127,6 @@ MCTSTree* MCTSTree::get_best_uct_child(double AC) const {
             best_node = child;
         }
     }
-
-    if(best_node== nullptr)
-      std::cout<<"stop"<<std::endl;
 
     return best_node;
 

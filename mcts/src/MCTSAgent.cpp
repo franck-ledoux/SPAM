@@ -19,7 +19,7 @@ MCTSAgent::~MCTSAgent() {
     delete m_tree;
 }
 /*---------------------------------------------------------------------------*/
-void MCTSAgent::run(IState* ARootState) {
+void MCTSAgent::run(std::shared_ptr<IState> ARootState) {
     //Build the initial tree
    m_tree  = new MCTSTree(ARootState);
 
@@ -30,12 +30,8 @@ void MCTSAgent::run(IState* ARootState) {
     while (i<=m_max_iterations && elapsed.count() <= m_max_seconds){
         // 1 SELECTION - we explore/exploit the existing tree to find a node to work on
         auto node = select(m_tree);
-        if(node== nullptr)
-            std::cout<<"stop"<<std::endl;
         // 2. EXPAND by adding a single child (if not terminal or not fully expanded)
         node = expand(node);
-        if(node== nullptr)
-            std::cout<<"stop"<<std::endl;
         // 3. SIMULATE (if not terminal)
         auto reward = simulate(node);
         // 4. BACK PROPAGATION
@@ -48,7 +44,7 @@ void MCTSAgent::run(IState* ARootState) {
     m_nb_seconds =elapsed.count();
 }
 /*---------------------------------------------------------------------------*/
-const IState* MCTSAgent::get_best_solution() {
+std::shared_ptr<IState> MCTSAgent::get_best_solution() {
     const MCTSTree* node = m_tree;
     while (!node->is_terminal() && node->has_children()){
         node=node->get_most_visited_child();
@@ -99,7 +95,7 @@ void MCTSAgent::back_propagate(MCTSTree* ANode, double AReward) {
     }
 }
 /*---------------------------------------------------------------------------*/
-IAction* MCTSAgent::get_random_action(const IState* AState) const {
+std::shared_ptr<IAction> MCTSAgent::get_random_action(std::shared_ptr<IState> AState) const {
     /** selects an action among the untried ones */
     auto actions = AState->get_actions();
     //randomly pick an action

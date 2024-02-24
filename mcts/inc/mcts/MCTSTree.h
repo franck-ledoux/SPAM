@@ -2,14 +2,15 @@
 #ifndef MATCHING_MCTSTREE_H
 #define MATCHING_MCTSTREE_H
 /*---------------------------------------------------------------------------*/
+#include <memory>
 #include "mcts/IState.h"
 #include "mcts/IAction.h"
 #include "mcts/IRewardFunction.h"
-#include <memory>
 /*---------------------------------------------------------------------------*/
 class MCTSTree{
 public:
-    MCTSTree(const IState* AState, MCTSTree* AParent = nullptr, IAction* AAction = nullptr);
+    MCTSTree(std::shared_ptr<IState> AState, std::shared_ptr<IAction> AAction = nullptr,
+             MCTSTree* AParent = nullptr);
 
     /**@brief Default destructor
      */
@@ -18,7 +19,7 @@ public:
     /**@brief Provides the state associated to the root node
      * @return the current root state
      */
-    const IState* get_state() const;
+    std::shared_ptr<IState> get_state() const;
 
     /**@brief Give access to the parent node
      * @return Returns the parent node. Returns nullptr for the root node
@@ -29,7 +30,7 @@ public:
      *        parent
      * @return an action, which can be null for the root
      */
-    IAction* get_action() const;
+    std::shared_ptr<IAction> get_action() const;
 
     /** Return the child that can be reached applying the action @p AAction.
      * It returns the node if it exists, but do not create it otherwise.
@@ -40,7 +41,7 @@ public:
 
     MCTSTree* get_most_visited_child() const;
 
-    MCTSTree*  add_child_with_action( IAction* new_action);
+    MCTSTree*  add_child_with_action(std::shared_ptr<IAction> new_action);
 
     MCTSTree*  expand();
     /** @return true if it doesn't remain actions to perform for generating child,
@@ -69,17 +70,17 @@ public:
 
 private:
     /** current state **/
-    const IState* m_state;
+    std::shared_ptr<IState> m_state;
+    /** action that generates this node from the parent **/
+    std::shared_ptr<IAction> m_action;
     /** parent node that is shared with all the siblings**/
     MCTSTree*  m_parent;
-    /** action that generates this node from the parent **/
-    IAction* m_action;
     /** children nodes, that are potentially empty. When a children node
      * is generated, it means that an action is remove from the m_untried_actions
      * collection **/
     std::vector<MCTSTree*> m_children;
 
-    std::vector<IAction*> m_actions;
+    std::vector<std::shared_ptr<IAction>> m_actions;
 };
 /*---------------------------------------------------------------------------*/
 #endif //MATCHING_MCTSTREE_H

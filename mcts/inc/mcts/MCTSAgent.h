@@ -2,6 +2,8 @@
 #ifndef MATCHING_MCTSAGENT_H
 #define MATCHING_MCTSAGENT_H
 /*---------------------------------------------------------------------------*/
+#include <memory>
+/*---------------------------------------------------------------------------*/
 #include "mcts/IState.h"
 #include "mcts/IAction.h"
 #include "mcts/IRewardFunction.h"
@@ -14,17 +16,17 @@ public:
               const int AMaxIterations=100000, const int AMaxSeconds=600,
               const int AMaxSimulationDepth=100);
     virtual ~MCTSAgent();
-    void run(IState* ARootState);
-    const IState* get_best_solution();
+    void run(std::shared_ptr<IState> ARootState);
+    std::shared_ptr<IState> get_best_solution();
     int get_nb_iterations() const {return m_nb_iterations;}
-    int get_nb_seconds() const {return m_nb_seconds;}
+    double get_nb_seconds() const {return m_nb_seconds;}
 
     /**@brief Among all the possible action generated from
     * @p AState, pick one randomly
     * @param[in] AState stage we generate an action from
     * @return the generated action
     */
-    IAction* get_random_action(const IState* AState) const;
+    std::shared_ptr<IAction> get_random_action(std::shared_ptr<IState> AState) const;
 
 private:
 
@@ -44,7 +46,7 @@ private:
     const int m_max_iterations;
     const int m_max_seconds;
     int m_nb_iterations;
-    int m_nb_seconds;
+    double m_nb_seconds;
     int m_simulation_depth;
 };
 

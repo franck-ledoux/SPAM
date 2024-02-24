@@ -18,24 +18,24 @@ TakuzuState::TakuzuState(const TakuzuState &AState) {
     }
 }
 /*---------------------------------------------------------------------------*/
-std::vector<IAction*> TakuzuState::get_actions() const
+std::vector<std::shared_ptr<IAction>> TakuzuState::get_actions() const
 {
-    std::vector<IAction*> actions;
+    std::vector<std::shared_ptr<IAction>> actions;
     for (auto i = 0; i < 4; i++) {
         for (auto j = 0; j < 4; j++) {
             if(board[i][j]=='.'){
-                actions.push_back(new TakuzuAction(i,j,'0'));
-                actions.push_back(new TakuzuAction(i,j,'1'));
+                actions.push_back(std::make_shared<TakuzuAction>(i,j,'0'));
+                actions.push_back(std::make_shared<TakuzuAction>(i,j,'1'));
             }
         }
     }
     return actions;
 }
 /*---------------------------------------------------------------------------*/
-const IState* TakuzuState::
-apply(const IAction* AAction) const {
-    auto next_state = new TakuzuState(*this);
-    auto a = dynamic_cast<const TakuzuAction*>(AAction);
+std::shared_ptr<IState> TakuzuState::
+apply(const std::shared_ptr<IAction> AAction) const {
+    auto next_state = std::make_shared<TakuzuState>(*this);
+    auto a = std::dynamic_pointer_cast<TakuzuAction>(AAction);
     next_state->board[a->i][a->j]=a->value;
     return next_state;
 }
@@ -108,10 +108,10 @@ bool TakuzuState::is_terminal() const {
     return lost() || win();
 }
 /*---------------------------------------------------------------------------*/
-double TakuzuRewardFunction::evaluate(const IState *AState) const {
-    if(dynamic_cast<const TakuzuState*>(AState)->win())
+double TakuzuRewardFunction::evaluate(std::shared_ptr<IState> AState) const {
+    if(std::dynamic_pointer_cast<TakuzuState>(AState)->win())
         return 1;
-    else if(dynamic_cast<const TakuzuState*>(AState)->lost())
+    else if(std::dynamic_pointer_cast<TakuzuState>(AState)->lost())
         return -1;
     return 0;
 }
