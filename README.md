@@ -1,7 +1,6 @@
-# Matching
-Matching yields for **Monte cArlo Tree searCh Hex blockING**. 
-It is the implementation of Monte Carlo Tree Search that we
-provide for solving hex blocking problems using MCTS structure.
+# SPAM
+SPAM yields for **Single PlAyer Monte carlo tree search**. 
+It is an implementation of Monte Carlo Tree Search that focuses on single-player games.
 
 ## MCTS Implementation
 We provide a single-player MCTS implementation in the directory [mcts](/mcts).
