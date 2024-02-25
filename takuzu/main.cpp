@@ -20,6 +20,5 @@ int main() {
     std::cout<<"Nb runs: "<<agent.get_nb_iterations()-1,
     std::cout<<", timing: "<<agent.get_nb_seconds()<<" s."<<std::endl;
     std::cout<<"Best solution:"<<std::endl;
-
     std::cout<<*std::dynamic_pointer_cast<TakuzuState>(agent.get_best_solution())<<std::endl;
 }
