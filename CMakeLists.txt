@@ -1,7 +1,7 @@
 #===============================================================================
 cmake_minimum_required(VERSION 3.20)
 #===============================================================================
-project(matching VERSION 1.0.0 LANGUAGES CXX)
+project(spam VERSION 1.0.0 LANGUAGES CXX)
 #===============================================================================
 # Standard options
 set(CMAKE_CXX_STANDARD 14)
