@@ -69,7 +69,8 @@ MCTSTree* MCTSAgent::expand(MCTSTree* ANode) {
     if(ANode->is_terminal())
         return ANode;
 
-    return nullptr;
+    //if we are here, there is an issue
+    throw std::runtime_error("Error: expansion has note been done");
 }
 /*---------------------------------------------------------------------------*/
 double MCTSAgent::simulate(MCTSTree* ANode) {

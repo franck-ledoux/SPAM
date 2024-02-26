@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cfloat>
 #include <limits>
-#include <random>
+#include <stdexcept>
 #include <algorithm>
 #include <memory>
 /*---------------------------------------------------------------------------*/
@@ -54,6 +54,9 @@ MCTSTree* MCTSTree::get_most_visited_child() const {
             best_node = c;
         }
     }
+    if(best_node== nullptr)
+        throw std::runtime_error("Error when visiting children");
+
     return best_node;
 
 
@@ -71,21 +74,10 @@ bool MCTSTree::has_children() const {
 MCTSTree*  MCTSTree::expand()  {
     // sanity check that we're not already fully expanded
     if(is_fully_expanded())
-        return nullptr;
+        throw std::runtime_error("Error: cannot expand a fully expanded node");
 
     if (is_terminal())
         return this;
-
-    // if this is the first expansion and we haven't yet got all of the possible actions
-    if(m_actions.empty()) {
-        // retrieve list of actions from the state
-        m_actions = m_state->get_actions();
-
-        // randomize the order
-        std::shuffle(m_actions.begin(),
-                     m_actions.end(),
-                     std::mt19937(std::random_device()()));
-    }
 
     // add the next action in queue as a child
     return add_child_with_action(m_actions[m_children.size()]);
@@ -109,7 +101,7 @@ MCTSTree*  MCTSTree::add_child_with_action(std::shared_ptr<IAction> AAction) {
 MCTSTree* MCTSTree::get_best_uct_child(double AC) const {
     // sanity check
     if(!is_fully_expanded())
-        return nullptr;
+        throw std::runtime_error("Error: cannot compute the best child for a partially expanded node");
 
     float best_utc_score = -std::numeric_limits<float>::max();
     MCTSTree* best_node = nullptr;
@@ -127,6 +119,8 @@ MCTSTree* MCTSTree::get_best_uct_child(double AC) const {
             best_node = child;
         }
     }
+    if(best_node== nullptr)
+        throw std::runtime_error("Error when getting the best child of a node");
 
     return best_node;
 
