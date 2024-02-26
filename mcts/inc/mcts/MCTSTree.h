@@ -39,10 +39,14 @@ public:
      */
     MCTSTree* get_child(const int AI) const;
 
+    /**@brief Returns the most visited child of the current root node
+     * @return a node, or subtree
+     */
     MCTSTree* get_most_visited_child() const;
 
-    MCTSTree*  add_child_with_action(std::shared_ptr<IAction> new_action);
-
+    /**@brief Create a new child that will be obtained by applying an untried action
+    * @return a child  node obtained from applying an untried action on the current state
+    */
     MCTSTree*  expand();
     /** @return true if it doesn't remain actions to perform for generating child,
      * false otherwise
@@ -54,7 +58,9 @@ public:
      * @return true if the game is over, false otherwise.
      */
     bool is_terminal() const;
-
+    /**@brief Check if the node has children
+     * @return true if the node has at least one child, false otherwise
+     */
     bool has_children() const;
     /**@brief Among all the children, provide the action that reach it
      *        based on the exploration/exploitation principle (UCT criterion here)
@@ -62,11 +68,19 @@ public:
        */
     MCTSTree*  get_best_uct_child(double AC=1.41) const;
 
-
     /** total reward of the current node */
     double cumulative_reward;
     /** number of times the node has been explored */
     int number_visits;
+
+private:
+    /**@brief add a child that will be obtained by applying action @p AAction. We do not check if this action
+     * has already be performed. The current tree implementation ensures that it is the case.
+     *
+     * @param[in] AAction the action to perform
+     * @return the node obtained from applying @p AAaction on the current state
+     */
+    MCTSTree*  add_child_with_action(std::shared_ptr<IAction> AAction);
 
 private:
     /** current state **/
@@ -76,10 +90,10 @@ private:
     /** parent node that is shared with all the siblings**/
     MCTSTree*  m_parent;
     /** children nodes, that are potentially empty. When a children node
-     * is generated, it means that an action is remove from the m_untried_actions
-     * collection **/
+     * is generated, it means that an action from m_actions has been applied*/
     std::vector<MCTSTree*> m_children;
 
+    /** actions to be applied. This list is only generated in the constructor **/
     std::vector<std::shared_ptr<IAction>> m_actions;
 };
 /*---------------------------------------------------------------------------*/

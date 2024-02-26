@@ -123,5 +123,4 @@ MCTSTree* MCTSTree::get_best_uct_child(double AC) const {
         throw std::runtime_error("Error when getting the best child of a node");
 
     return best_node;
-
 }

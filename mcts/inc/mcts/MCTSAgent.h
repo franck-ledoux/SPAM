@@ -67,21 +67,34 @@ private:
      * @return the reward obtained by the simulation process
      */
     double simulate(MCTSTree* ANode);
-    /**@brief Creates a new child for @p ANode by applying an untried actions. If there
+    /**@brief Creates a new child for @p ANode by applying an untried actions. If there is no action to perform
+     * it returns the input node @p ANode
      *
-     * @param[in] ANode
-     * @return
+     * @param[in] ANode the node to expand from
+     * @return the new child node
      */
     MCTSTree* expand(MCTSTree* ANode);
+    /**@brief Back propagate the reward obtained at node @p ANode to all the nodes met in his parenthood
+     *
+     * @param[in] ANode the node we start from
+     * @param[in] AReward the reward to give to all parents
+     */
     void back_propagate(MCTSTree* ANode, double AReward);
 private:
+    /** the tree we build during the run() process */
     MCTSTree* m_tree;
+    /** the reward function we use to evaluate each state */
     const IRewardFunction* m_reward_function;
+    /** the max number of MCTS iterations that are performed*/
     const int m_max_iterations;
+    /** the max number of seconds we accept to spend in the process*/
     const int m_max_seconds;
-    int m_nb_iterations;
-    double m_nb_seconds;
+    /** the max size of a simulation */
     int m_simulation_depth;
+    /** the number of iterations that are really done*/
+    int m_nb_iterations;
+    /** the number of seconds really spent in the process*/
+    double m_nb_seconds;
 };
 
 
