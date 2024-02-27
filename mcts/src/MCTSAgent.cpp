@@ -1,18 +1,28 @@
 /*---------------------------------------------------------------------------*/
-#include "mcts/MCTSAgent.h"
 #include <chrono>
 #include <iostream>
 #include <random>
+#include <fstream>
+#include <nlohmann/json.hpp>
 /*---------------------------------------------------------------------------*/
+#include "mcts/MCTSAgent.h"
+/*---------------------------------------------------------------------------*/
+using json = nlohmann::json;
+/*---------------------------------------------------------------------------*/
+
 MCTSAgent::MCTSAgent(const IRewardFunction* ARewardFunction,
                      const int AMaxIterations,
                      const int AMaxSeconds,
                      const int AMaxSimulationDepth)
 : m_tree(nullptr),
-m_reward_function(ARewardFunction),
-m_max_iterations(AMaxIterations),
-m_max_seconds(AMaxSeconds),
-m_simulation_depth(AMaxSimulationDepth)
+  m_reward_function(ARewardFunction),
+  m_max_iterations(AMaxIterations),
+  m_max_seconds(AMaxSeconds),
+  m_simulation_depth(AMaxSimulationDepth),
+  m_debug_activate(false),
+  m_debug_file_prefix("mcts"),
+  m_debug_mode(MCTSAgent::OUT_END_ONLY),
+  m_debug_frequency(1)
 {}
 /*---------------------------------------------------------------------------*/
 MCTSAgent::~MCTSAgent() {
@@ -20,6 +30,9 @@ MCTSAgent::~MCTSAgent() {
 }
 /*---------------------------------------------------------------------------*/
 void MCTSAgent::run(std::shared_ptr<IState> ARootState) {
+    //check that an existing tree was not used during a previous iteration
+    if(m_tree)
+        delete m_tree;
     //Build the initial tree
    m_tree  = new MCTSTree(ARootState);
 
@@ -39,9 +52,16 @@ void MCTSAgent::run(std::shared_ptr<IState> ARootState) {
         //increase loop counters
         i++;
         elapsed= std::chrono::steady_clock::now()-time0;
+        if(m_debug_activate && m_debug_mode==OUT_ITERATION){
+            if(i%m_debug_frequency==0)
+                export_tree_in_json();
+        }
     }
     m_nb_iterations=i;
     m_nb_seconds =elapsed.count();
+    if (m_debug_activate && (m_debug_mode==OUT_END_ONLY || m_debug_mode==OUT_END_ONLY)){
+        export_tree_in_json();
+    }
 }
 /*---------------------------------------------------------------------------*/
 std::shared_ptr<IState> MCTSAgent::get_best_solution() {
@@ -104,4 +124,52 @@ std::shared_ptr<IAction> MCTSAgent::get_random_action(std::shared_ptr<IState> AS
     std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> distrib(0, actions.size()-1);
     return actions[distrib(gen)];
+}
+/*---------------------------------------------------------------------------*/
+void MCTSAgent::activate_debug_mode(const std::string &AFileNamePrefix,
+                                    const DEBUG_OUTPUT_MODE AOutputMode,
+                                    const int AFrequency)
+{
+    m_debug_activate = true;
+    m_debug_file_prefix = AFileNamePrefix;
+    m_debug_mode = AOutputMode;
+    m_debug_frequency=AFrequency;
+}
+/*---------------------------------------------------------------------------*/
+void MCTSAgent::desactivate_debug_output() {
+    m_debug_activate=false;
+}
+/*---------------------------------------------------------------------------*/
+void MCTSAgent::export_tree_in_json() {
+    static int file_index=0;
+    json j;
+    std::vector<MCTSTree*> to_do;
+    auto node_id=0;
+    to_do.push_back(m_tree);
+    std::map<MCTSTree*, int> tree_id;
+    tree_id[nullptr]=0;
+    while (!to_do.empty()){
+        //get the last node
+        auto n = to_do.back();
+        to_do.pop_back();
+
+        tree_id[n]=++node_id;
+        j["nodes"].push_back(json{{"id",tree_id[n]},
+                                  {"reward",n->cumulative_reward},
+                                  {"visits",n->number_visits}});
+
+        if(tree_id[n->get_parent()]!=0){
+            //means n is not the root
+            j["links"].push_back(json{{"parent",tree_id[n->get_parent()]},
+                                      {"child",tree_id[n]}});
+
+        }
+        auto children = n->get_children();
+        to_do.insert(to_do.end(),children.begin(),children.end());
+    }
+    std::ofstream file;
+    file.open (m_debug_file_prefix+"_"+std::to_string(file_index)+".json");
+    file<<j;
+    file.close();
+    file_index++;
 }

@@ -58,13 +58,14 @@ MCTSTree* MCTSTree::get_most_visited_child() const {
         throw std::runtime_error("Error when visiting children");
 
     return best_node;
-
-
-
 }
 /*---------------------------------------------------------------------------*/
 MCTSTree* MCTSTree::get_child(const int AI) const {
     return m_children[AI];
+}
+
+std::vector<MCTSTree *> MCTSTree::get_children() const {
+    return m_children;
 }
 /*---------------------------------------------------------------------------*/
 bool MCTSTree::has_children() const {
