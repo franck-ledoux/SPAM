@@ -21,7 +21,8 @@ a Sudoku-like problem that is played by a single player.
 There exist many ways to implement a MCTS. The version proposed here is mainly inspired by https://gibberblot.github.io/rl-notes/single-agent/mcts.html.
 
 ## Further readings
-- A research paper on the single-player problem: https://dke.maastrichtuniversity.nl/m.winands/documents/CGSameGame.pdf.
+- A research paper on the single-player problem (2008): https://dke.maastrichtuniversity.nl/m.winands/documents/CGSameGame.pdf.
+- Another one that aims to "optimize" the time consumption (2008): https://dke.maastrichtuniversity.nl/m.winands/documents/pMCTS.pdf
 - Aonther one, which is more recent (2021): vhttps://ojs.aaai.org/index.php/AAAI/article/view/17468.
 - A recent review (2022) on the Monte Carlo Tree Search technique: https://arxiv.org/abs/2103.04931.
 - A blog on SP MCTS: https://tmoer.github.io/AlphaZero/
