@@ -16,10 +16,57 @@ as possible, previous interfaces only use smart pointers.
 An example of problem solving using this MCTS implementation is given in [takuzu](/takuzu). The takuzu is
 a Sudoku-like problem that is played by a single player. 
 
+## MCTS Installation and usage
+
+We use CMake to build our project, which depends on the [nlohmann-json](https://github.com/nlohmann/json) library for 
+handling json files. When building the dev environnement using cmake, you will have to previously install 
+**nlohmann-json**, and to add its location into your CMAKE_PREFIX_PATH. 
+
+Using [spack](https://github.com/spack/spack) to install dependencies, you can do the following commands
+
+```shell
+spack install nlohmann-json
+```
+And add such a cmake option: 
+```cmake
+-DCMAKE_PREFIX_PATH=/home/.../spack/opt/spack/linux-ubuntu22.04-icelake/gcc-11.4.0/nlohmann-json-3.11.2-xpjtkhg6i3k5mbh2x4yrkqsh4dxs3rl6
+```
 ## MCTS explained
 
 There exist many ways to implement a MCTS. The version proposed here is mainly inspired by https://gibberblot.github.io/rl-notes/single-agent/mcts.html.
 
+## Json format for exporting trees from SPAM
+
+The [MCTSAgent](mcts/inc/mcts/MCTSAgent.h) class allows to automatically export 
+the current state of the MCTS tree in a json file. In the following pieces of codes, we activate the debug mode of the 
+agent **a** before running the MCTS algorithm. The option *OUT_END_ONLY* indicates that we will 
+only export the final tree. It will be written in the file  "*takuzu_0.json*".
+```c++
+MCTSAgent a(...)
+a.activate_debug_mode("takuzu", MCTSAgent::OUT_END_ONLY);
+a.run(s);
+```
+With the following options, one file will be written every two cycles 
+```c++
+a.activate_debug_mode("takuzu", MCTSAgent::OUT_ITERATION,2);
+```
+The generated json files will look like this.
+```json
+{
+  "links": [
+    {"child": 2, "parent": 1}, {"child": 3, "parent": 1},
+    {"child": 4, "parent": 1}, {"child": 5, "parent": 1},
+    ...
+  ],
+  "nodes": [
+    {"id": 1, "reward": -11.0, "visits": 11},
+    {"id": 2, "reward": -1.0, "visits": 1},
+    {"id": 3, "reward": -1.0, "visits": 1
+    },
+    ...
+  ]
+}
+```
 ## Further readings
 - A research paper on the single-player problem (2008): https://dke.maastrichtuniversity.nl/m.winands/documents/CGSameGame.pdf.
 - Another one that aims to "optimize" the time consumption (2008): https://dke.maastrichtuniversity.nl/m.winands/documents/pMCTS.pdf

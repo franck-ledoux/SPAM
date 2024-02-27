@@ -12,6 +12,7 @@ set(SRC_FILES
 #===============================================================================
 add_library(${LIB_NAME})
 target_sources(${LIB_NAME} PRIVATE ${SRC_FILES})
+target_link_libraries(${LIB_NAME} PRIVATE nlohmann_json::nlohmann_json)
 #===============================================================================
 if(ENABLE_TEST)
     add_subdirectory(tst)

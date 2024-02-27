@@ -14,6 +14,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
 include(GNUInstallDirs)
 include(project_macros)
 
+
+#===============================================================================
+find_package(nlohmann_json 3.2.0 REQUIRED)
 #===============================================================================
 add_subdirectory(mcts)
 add_subdirectory(takuzu)

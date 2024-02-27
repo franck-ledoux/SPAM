@@ -12,6 +12,14 @@
 class MCTSAgent {
 public:
 
+    /**@brief Enumerate type for handling output files in debug mode.
+     */
+    enum DEBUG_OUTPUT_MODE{
+        OUT_NO,         // no output
+        OUT_ITERATION,  // output at some iterations
+        OUT_END_ONLY    // output at the end only
+    };
+
     /**@brief Constructor
      *
      * @param ARewardFunction reward function to evaluate a state
@@ -26,8 +34,22 @@ public:
     /**@brief default destructor
      */
     virtual ~MCTSAgent();
-    /**@brief Launch the algorithm
+
+    /**@brief Activates the export of output files during the process
      *
+     * @param AFileNamePrefix file name prefix to output files
+     * @param AOutputMode output mode
+     * @param AFrequency  output frequency only used for the OUT_ITERATION mode. A frequency of one indicates
+     *                    that it export the tree for every mcts cycle (selection, expansion, simulation, backpropagation)
+     */
+    void activate_debug_mode(const std::string& AFileNamePrefix= "mcts",
+                             const DEBUG_OUTPUT_MODE AOutputMode = OUT_END_ONLY,
+                             const int AFrequency= 1);
+
+    /**@brief desactivate the debug output mode*/
+    void desactivate_debug_output();
+
+    /**@brief Launch the algorithm
      * @param ARootState the state we start from to build the MCSTree
      */
     void run(std::shared_ptr<IState> ARootState);
@@ -80,6 +102,8 @@ private:
      * @param[in] AReward the reward to give to all parents
      */
     void back_propagate(MCTSTree* ANode, double AReward);
+
+    void export_tree_in_json();
 private:
     /** the tree we build during the run() process */
     MCTSTree* m_tree;
@@ -95,6 +119,15 @@ private:
     int m_nb_iterations;
     /** the number of seconds really spent in the process*/
     double m_nb_seconds;
+    /** debug output activate (true) or not (false) */
+    bool m_debug_activate;
+    /** debug output prefix file name */
+    std::string m_debug_file_prefix;
+    /** debug mode*/
+    DEBUG_OUTPUT_MODE m_debug_mode;
+    /** frequency in tuned mode*/
+    int m_debug_frequency;
+
 };
 
 

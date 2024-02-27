@@ -38,6 +38,10 @@ public:
      * @return the expected node, or nullptr if it doesn't exist
      */
     MCTSTree* get_child(const int AI) const;
+    /** Return access to the container of children of (*this). Carefully a
+     * handle this access.
+     */
+    std::vector<MCTSTree*> get_children() const;
 
     /**@brief Returns the most visited child of the current root node
      * @return a node, or subtree
