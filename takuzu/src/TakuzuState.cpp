@@ -1,6 +1,8 @@
 /*---------------------------------------------------------------------------*/
 #include <iostream>
-#include "Takuzu.h"
+/*---------------------------------------------------------------------------*/
+#include "../inc/TakuzuState.h"
+#include "../inc/TakuzuAction.h"
 /*---------------------------------------------------------------------------*/
 TakuzuState::TakuzuState() {
     for (auto i = 0; i < 4; i++) {
@@ -108,18 +110,8 @@ bool TakuzuState::is_terminal() const {
     return lost() || win();
 }
 /*---------------------------------------------------------------------------*/
-double TakuzuRewardFunction::evaluate(std::shared_ptr<IState> AState) const {
-    if(std::dynamic_pointer_cast<TakuzuState>(AState)->win())
-        return 1;
-    else if(std::dynamic_pointer_cast<TakuzuState>(AState)->lost())
-        return -1;
-    return 0;
-}
-/*---------------------------------------------------------------------------*/
-std::ostream& operator<<(std::ostream& os, const TakuzuAction& TA){
-    os<<"("<<TA.i<<"-"<<TA.j<<":"<<TA.value<<")";
-    return os;
-}
+void TakuzuState::write(const std::string &AFileName, const int AStageIndex,
+                        const int ANodeId, const int ADepth) const {;}
 /*---------------------------------------------------------------------------*/
 std::ostream& operator<<(std::ostream& os, const TakuzuState& TS){
     for(auto i=0;i<4;i++){

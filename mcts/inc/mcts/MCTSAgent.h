@@ -103,7 +103,7 @@ private:
      */
     void back_propagate(MCTSTree* ANode, double AReward);
 
-    void export_tree_in_json();
+    void export_tree();
 private:
     /** the tree we build during the run() process */
     MCTSTree* m_tree;
