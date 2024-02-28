@@ -9,10 +9,15 @@
 /*---------------------------------------------------------------------------*/
 #include "mcts/MCTSTree.h"
 /*---------------------------------------------------------------------------*/
-MCTSTree::MCTSTree(std::shared_ptr<IState> AState, std::shared_ptr<IAction> AAction, MCTSTree *AParent)
+MCTSTree::MCTSTree(std::shared_ptr<IState> AState,
+                   std::shared_ptr<IAction> AAction,
+                   MCTSTree *AParent)
 : m_state(AState), m_action(AAction), m_parent(AParent),
   cumulative_reward(0), number_visits(0)
 {
+    static int global_id=0;
+    m_id = global_id++;
+    m_depth = (m_parent==nullptr)?0:m_parent->m_depth+1;
     m_actions =m_state->get_actions();
 }
 /*---------------------------------------------------------------------------*/
@@ -20,6 +25,10 @@ MCTSTree::~MCTSTree() {
     for(auto c: m_children)
         delete c;
 }
+/*---------------------------------------------------------------------------*/
+int MCTSTree::get_id() const {return m_id;}
+/*---------------------------------------------------------------------------*/
+int MCTSTree::get_depth() const {return m_depth;}
 /*---------------------------------------------------------------------------*/
 std::shared_ptr<IState> MCTSTree::get_state() const {
     return m_state;

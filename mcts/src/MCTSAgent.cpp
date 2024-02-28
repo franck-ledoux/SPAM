@@ -54,13 +54,13 @@ void MCTSAgent::run(std::shared_ptr<IState> ARootState) {
         elapsed= std::chrono::steady_clock::now()-time0;
         if(m_debug_activate && m_debug_mode==OUT_ITERATION){
             if(i%m_debug_frequency==0)
-                export_tree_in_json();
+                export_tree();
         }
     }
     m_nb_iterations=i;
     m_nb_seconds =elapsed.count();
-    if (m_debug_activate && (m_debug_mode==OUT_END_ONLY || m_debug_mode==OUT_END_ONLY)){
-        export_tree_in_json();
+    if (m_debug_activate && (m_debug_mode==OUT_END_ONLY || m_debug_mode==OUT_ITERATION)){
+        export_tree();
     }
 }
 /*---------------------------------------------------------------------------*/
@@ -140,28 +140,30 @@ void MCTSAgent::desactivate_debug_output() {
     m_debug_activate=false;
 }
 /*---------------------------------------------------------------------------*/
-void MCTSAgent::export_tree_in_json() {
+void MCTSAgent::export_tree() {
     static int file_index=0;
     json j;
     std::vector<MCTSTree*> to_do;
-    auto node_id=0;
     to_do.push_back(m_tree);
     std::map<MCTSTree*, int> tree_id;
-    tree_id[nullptr]=0;
     while (!to_do.empty()){
         //get the last node
         auto n = to_do.back();
         to_do.pop_back();
 
-        tree_id[n]=++node_id;
-        j["nodes"].push_back(json{{"id",tree_id[n]},
+        //export the state of n
+        n->get_state()->write(m_debug_file_prefix,file_index,
+                              n->get_id(),n->get_depth());
+
+        j["nodes"].push_back(json{{"id",n->get_id()},
+                                  {"depth",n->get_depth()},
                                   {"reward",n->cumulative_reward},
                                   {"visits",n->number_visits}});
 
         if(tree_id[n->get_parent()]!=0){
             //means n is not the root
-            j["links"].push_back(json{{"parent",tree_id[n->get_parent()]},
-                                      {"child",tree_id[n]}});
+            j["links"].push_back(json{{"parent",n->get_parent()->get_id()},
+                                      {"child",n->get_id()}});
 
         }
         auto children = n->get_children();

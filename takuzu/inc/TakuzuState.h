@@ -1,29 +1,10 @@
 /*---------------------------------------------------------------------------*/
-#ifndef MATCHING_TAKUZU_H
-#define MATCHING_TAKUZU_H
+#ifndef SPAM_TAKUZU_STATE_H
+#define SPAM_TAKUZU_STATE_H
 /*---------------------------------------------------------------------------*/
-#include <mcts/IState.h>
-#include <mcts/IAction.h>
-#include <mcts/IRewardFunction.h>
+#include "mcts/IState.h"
 #include <iostream>
 #include <memory>
-/*---------------------------------------------------------------------------*/
-class TakuzuAction : public IAction {
-public:
-    const int i;
-    const int j;
-    const char value;
-
-    TakuzuAction(const int AI, const int AJ, const char AVal)
-    :i(AI),j(AJ),value(AVal){;};
-
-    bool operator==(const IAction& other) const override {
-        const auto &o = (const TakuzuAction &) other;
-        return i == o.i && j == o.j && value == o.value;
-    }
-    friend std::ostream& operator<<(std::ostream& os, const TakuzuAction& TA);
-
-};
 /*---------------------------------------------------------------------------*/
 class TakuzuState : public IState {
 public:
@@ -41,6 +22,11 @@ public:
     std::shared_ptr<IState> apply(std::shared_ptr<IAction>  AAction) const override;
 
     bool is_terminal() const override;
+
+    void write(const std::string& AFileName,
+               const int AStageIndex,
+               const int ANodeId,
+               const int ADepth) const override;
     bool  lost() const;
     bool  win() const;
 
@@ -48,12 +34,5 @@ public:
 };
 
 /*---------------------------------------------------------------------------*/
-struct TakuzuRewardFunction: public IRewardFunction{
-
-
-    double evaluate(std::shared_ptr<IState> AState) const override;
-
-};
-/*---------------------------------------------------------------------------*/
-#endif //MATCHING_TAKUZU_H
+#endif //SPAM_TAKUZU_STATE_H
 /*---------------------------------------------------------------------------*/

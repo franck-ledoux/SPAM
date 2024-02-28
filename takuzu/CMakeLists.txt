@@ -1,6 +1,17 @@
 #===============================================================================
 set(EXE_NAME Takuzu)
-set(SRC_FILES Takuzu.h Takuzu.cpp main.cpp)
+
+set(INC_FILES
+        inc/TakuzuRewardFunction.h
+        inc/TakuzuAction.h
+        inc/TakuzuState.h)
+
+set(SRC_FILES
+        src/TakuzuRewardFunction.cpp
+        src/TakuzuAction.cpp
+        src/TakuzuState.cpp
+        src/main.cpp)
+
 #===============================================================================
 add_executable(${EXE_NAME})
 target_sources(${EXE_NAME} PRIVATE ${SRC_FILES})

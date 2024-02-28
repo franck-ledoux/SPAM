@@ -9,13 +9,21 @@
 /*---------------------------------------------------------------------------*/
 class MCTSTree{
 public:
-    MCTSTree(std::shared_ptr<IState> AState, std::shared_ptr<IAction> AAction = nullptr,
+    MCTSTree(std::shared_ptr<IState> AState,
+             std::shared_ptr<IAction> AAction = nullptr,
              MCTSTree* AParent = nullptr);
 
     /**@brief Default destructor
      */
     ~MCTSTree();
-
+    /**
+     * @return root node id
+     */
+    int get_id() const;
+    /**
+     * @return root node depth
+     */
+    int get_depth() const;
     /**@brief Provides the state associated to the root node
      * @return the current root state
      */
@@ -87,6 +95,10 @@ private:
     MCTSTree*  add_child_with_action(std::shared_ptr<IAction> AAction);
 
 private:
+    /** node id that is generated from the parent id*/
+    int m_id;
+    /** depth in the main tree, stored and note computed. A depth of 0 means tree root*/
+    int m_depth;
     /** current state **/
     std::shared_ptr<IState> m_state;
     /** action that generates this node from the parent **/

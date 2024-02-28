@@ -1,6 +1,7 @@
 /*---------------------------------------------------------------------------*/
 #include <iostream>
-#include "Takuzu.h"
+#include "../inc/TakuzuRewardFunction.h"
+#include "../inc/TakuzuState.h"
 #include "mcts/MCTSAgent.h"
 /*---------------------------------------------------------------------------*/
 int main() {
