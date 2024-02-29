@@ -1,15 +1,36 @@
-import networkx as nx
-from networkx.readwrite import json_graph
-from networkx.drawing.nx_pydot import graphviz_layout
 import matplotlib.pyplot as plt
+import networkx as nx
+import pygraphviz
+from networkx.drawing.nx_pydot import graphviz_layout
+import json
 
-# Replace graph_json variable with JSON representation of graph
-graph_json = {"nodes": [{"id": 1, "name": "A"},{"id": 2, "name": "B"}],"links": [{"source":1,"target":2}]}
+# Opening JSON file
+f = open('takuzu_1.json')
 
-node_labels = {node['id']:node['name'] for node in graph_json['nodes']}
-for n in graph_json['nodes']:
-    del n['name']
-g = json_graph.node_link_graph(graph_json, directed=True, multigraph=False)
-pos = graphviz_layout(g, prog="dot")
-nx.draw(g.to_directed(), pos, labels=node_labels, with_labels=True)
+# returns JSON object as
+# a dictionary
+data = json.load(f)
+
+# Iterating through the json
+node_info= {}
+for n in data['nodes']:
+    node_info[n['id']]="R="+str(n['reward'])+"\n V="+str(n['visits'])
+
+edges=[]
+for e in data['links']:
+    edges.append([e['parent'],e['child']])
+   # edges = [[0,1],[0,2],[1,3],[1,4]]
+
+# Closing file
+f.close()
+#T = nx.balanced_tree(2, 5)
+
+T = nx.Graph()
+
+T.add_edges_from(edges)
+
+
+pos = nx.nx_agraph.graphviz_layout(T,prog="dot")
+
+nx.draw(T, pos,labels=node_info, with_labels = True)# node_size=500)
 plt.show()
