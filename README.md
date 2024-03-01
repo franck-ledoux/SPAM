@@ -73,4 +73,5 @@ The generated json files will look like this.
 - Aonther one, which is more recent (2021): vhttps://ojs.aaai.org/index.php/AAAI/article/view/17468.
 - A recent review (2022) on the Monte Carlo Tree Search technique: https://arxiv.org/abs/2103.04931.
 - A blog on SP MCTS: https://tmoer.github.io/AlphaZero/
-- A lesson on MCTS: https://courses.cs.washington.edu/courses/cse599i/18wi/resources/lecture19/lecture19.pdf
+- A lesson on MCTS: https://courses.cs.washington.edu/courses/cse599i/18wi/resources/lecture19/lecture19.pdf.
+- A self-learinng single player MCTS: https://www.frontiersin.org/articles/10.3389/fnbot.2023.1039644/full.
