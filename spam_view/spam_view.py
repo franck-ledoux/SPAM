@@ -2,8 +2,6 @@ from collections import defaultdict
 
 import matplotlib.pyplot as plt
 import networkx as nx
-import pygraphviz
-from networkx.drawing.nx_pydot import graphviz_layout
 import json
 import sys
 
