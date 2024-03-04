@@ -1,5 +1,4 @@
 from collections import defaultdict
-
 import matplotlib.pyplot as plt
 import networkx as nx
 import json
@@ -7,14 +6,24 @@ import sys
 
 
 def filter_params(param_dict):
-    if len(param_dict) != 5:
-        print("Invalid parameters, 4 parameters are required:")
+    if len(param_dict) != 2:
+        print("Invalid parameters, 1 json parameter file must be provided and it must contain 4 fields")
         print("\t 1.[in ] JSON file that contains the MCTS info")
         print("\t 2.[in ] Node id we want to start from ")
         print("\t 3.[in ] Subtree depth (0 means only the node previously given")
         print("\t 4.[out] File to save the graph (png)")
+        print("For instance :")
+        print("{")
+        print("\"tree_file\":\"takuzu_2.json\",")
+        print("\"image_file\":\"tree.png\",")
+        print("\"source-node\":1,")
+        print("\"depth\":2")
+        print("}")
         exit(0)
-    return param_dict[1], int(param_dict[2]), int(param_dict[3]), param_dict[4]
+    f = open(param_dict[1])
+    data = json.load(f)
+    f.close()
+    return data["tree_file"], int(data["source-node"]), int(data["depth"]), data["image_file"]
 
 def create_tree(file_name, node_id, depth):
 
@@ -39,7 +48,10 @@ def create_tree(file_name, node_id, depth):
     for n in t.nodes():
         node_layers[node_info[n][3] - source_depth].append(n)
 
-    max_number_nodes = len(max(node_layers.values()))
+    for l in node_layers.values():
+        print("Layer "+str(len(l)))
+    max_number_nodes = max(node_layers.values())
+    print("Max number of nodes: ", max_number_nodes)
     space = 700
     y=0
     x=0
@@ -49,7 +61,7 @@ def create_tree(file_name, node_id, depth):
             pos[n]=(x,y)
             x = x+space
         x=0
-        y= y -10
+        y= y -600
 
     return t, node_info, pos
 
@@ -61,7 +73,7 @@ def display(tree, node_data, pos, file_out):
                      +"\n R="+str(int(node_data[n][1])))
                      +"\n V="+str(int(node_data[n][2])))
 
-    plt.figure(figsize=(10,4))
+    plt.figure(figsize=(20,3))
     nx.draw_networkx_nodes(tree, pos, node_size=600, alpha=1, node_shape='s')
     nx.draw_networkx_edges(tree,pos,width=4, alpha=0.2, arrowsize=1)
     nx.draw_networkx_labels(tree,pos,labels,font_size=6)
