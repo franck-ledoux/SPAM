@@ -160,13 +160,14 @@ void MCTSAgent::export_tree() {
         to_do.pop_back();
 
         //export the state of n
-        n->get_state()->write(m_debug_file_prefix,file_index,
+        auto state_data = n->get_state()->write(m_debug_file_prefix,file_index,
                               n->get_id(),n->get_depth());
 
         j["nodes"].push_back(json{{"id",n->get_id()},
                                   {"depth",n->get_depth()},
                                   {"reward",n->cumulative_reward},
-                                  {"visits",n->number_visits}});
+                                  {"visits",n->number_visits},
+                                  {"data",state_data}});
 
         if(n->get_parent()!= nullptr){
             //means n is not the root

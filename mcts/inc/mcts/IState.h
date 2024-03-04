@@ -33,13 +33,17 @@ public:
     /**@provide a function to write a file that stores the state knowing a file name prefix @p AFileName,
      * the stage index @p AStageIndex, the id, and the depth of the node that knows this state in the
      * MCTS tree. By default, you can provide an empty implementation that does nothing.
+     * The returned value is a string that will be stored in a "data" field of the json tree output. By default
+     * return an empty string if you don't want to store something. Oterwise, please respect json syntax.
      *
      * @param[in] AFileName  A file name
      * @param[in] AStageIndex Stage index
      * @param[in] ANodeId    Id of the node that contains this state
      * @param[in] ADepth     Depth of the node that contains this state
+     *
+     * @return A string to store in the data field of each node
      */
-    virtual void write(const std::string& AFileName,
+    virtual std::string write(const std::string& AFileName,
                        const int AStageIndex,
                        const int ANodeId,
                        const int ADepth) const = 0;

@@ -110,8 +110,10 @@ bool TakuzuState::is_terminal() const {
     return lost() || win();
 }
 /*---------------------------------------------------------------------------*/
-void TakuzuState::write(const std::string &AFileName, const int AStageIndex,
-                        const int ANodeId, const int ADepth) const {;}
+std::string TakuzuState::write(const std::string &AFileName, const int AStageIndex,
+                        const int ANodeId, const int ADepth) const {
+    return "";
+}
 /*---------------------------------------------------------------------------*/
 std::ostream& operator<<(std::ostream& os, const TakuzuState& TS){
     for(auto i=0;i<4;i++){
