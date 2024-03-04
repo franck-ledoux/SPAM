@@ -145,7 +145,6 @@ void MCTSAgent::export_tree() {
     json j;
     std::vector<MCTSTree*> to_do;
     to_do.push_back(m_tree);
-    std::map<MCTSTree*, int> tree_id;
     while (!to_do.empty()){
         //get the last node
         auto n = to_do.back();
@@ -160,7 +159,7 @@ void MCTSAgent::export_tree() {
                                   {"reward",n->cumulative_reward},
                                   {"visits",n->number_visits}});
 
-        if(tree_id[n->get_parent()]!=0){
+        if(n->get_parent()!= nullptr){
             //means n is not the root
             j["links"].push_back(json{{"parent",n->get_parent()->get_id()},
                                       {"child",n->get_id()}});
