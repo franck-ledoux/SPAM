@@ -136,7 +136,6 @@ private:
     DEBUG_OUTPUT_MODE m_debug_mode;
     /** frequency in tuned mode*/
     int m_debug_frequency;
-
 };
 
 
