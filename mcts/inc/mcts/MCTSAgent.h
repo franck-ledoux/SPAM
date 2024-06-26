@@ -3,6 +3,7 @@
 #define MATCHING_MCTSAGENT_H
 /*---------------------------------------------------------------------------*/
 #include <memory>
+#include <string>
 /*---------------------------------------------------------------------------*/
 #include "mcts/IState.h"
 #include "mcts/IAction.h"
@@ -60,6 +61,14 @@ public:
      * @return the "best" solution
      */
     std::shared_ptr<IState> get_best_solution();
+
+
+    /**@brief Returns the best child of the root. We consider
+     * here the best solution as being the most visited node at each level.
+     *
+     * @return the "best" root child
+     */
+    std::shared_ptr<IState> get_best_child();
     /**@brief provides the number of iterations done by the algorithm
      */
     int get_nb_iterations() const {return m_nb_iterations;}

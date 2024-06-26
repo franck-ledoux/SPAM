@@ -25,6 +25,11 @@ public:
      */
     virtual bool is_terminal() const = 0;
 
+    /**@brief Indicates if the concrete state is a winning state
+      * @return true if it is, false otherwise
+      */
+    virtual bool win() const = 0;
+
     /**@provide a function to write a file that stores the state knowing a file name prefix @p AFileName,
      * the stage index @p AStageIndex, the id, and the depth of the node that knows this state in the
      * MCTS tree. By default, you can provide an empty implementation that does nothing.
