@@ -23,12 +23,13 @@ public:
 
     bool is_terminal() const override;
 
+    bool  win() const override;
+
     void write(const std::string& AFileName,
                const int AStageIndex,
                const int ANodeId,
                const int ADepth) const override;
     bool  lost() const;
-    bool  win() const;
 
     friend std::ostream& operator<<(std::ostream& os, const TakuzuState& TS);
 };

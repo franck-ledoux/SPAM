@@ -9,14 +9,31 @@ Running this MCTS on your problem requires to implement three interfaces, which 
 - [IAcation](mcts/inc/mcts/IAction.h) indicates how to compare actions;
 - [IRewardFunction](mcts/inc/mcts/IRewardFunction.h) contains the reward evaluation of a given state.
 
-The memory management of the MCTS is based on smart (std::shared_ptr) and raw pointers. Memory check is regularly
+The memory management of the MCTS is based on smart (``std::shared_ptr``) and raw pointers. Memory check is regularly
 performed and there is no memory leak in the current implementation. In order to avoid memory issues as much
 as possible, previous interfaces only use smart pointers.
 
 An example of problem solving using this MCTS implementation is given in [takuzu](/takuzu). The takuzu is
 a Sudoku-like problem that is played by a single player. 
 
-## MCTS Installation and usage
+Without getting in the details, the two main classes that are implemented
+the MCTS algorithm are [MCTSAgent](mcts/inc/mcts/MCTSAgent.h) en [MCTSTree](mcts/inc/mcts/MCTSTree.h). In practice, when
+using SPAM, you do not need to look at the **MCSTree** class. On its side, the **MCTSAgent** class provides the 
+``run`` method that implement the iterative procedure depicted below.
+
+![MCTS_pipeline](doc/mcts.png "MCTS picture")
+
+When instantiating an **MCTSAgent** agent, we must give it the reward function that 
+will be used during the process, but also the maximum number of iterations we accept, and the
+maximun number of seconds.
+
+The other important class is **MCTSLoop**. Its role is to integrate the MCTS pipeline execution 
+inside a loopStarting from an initial state *s0* and a given agent *a*, we will iteratively ask *a* to run an MCTS 
+pipeline to generate a new state. More specifically, the input of an iteration is a state **si**, we run **a** with 
+**si** as the root of the MCTS tree. When it is done, we get the best child of this tree root, or the best 
+node in the tree as an output. It will become the input of the next iteration.
+
+## MCTS Installation
 
 We use CMake to build our project, which depends on the [nlohmann-json](https://github.com/nlohmann/json) library for 
 handling json files. When building the dev environnement using cmake, you will have to previously install 

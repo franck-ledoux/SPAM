@@ -71,6 +71,15 @@ std::shared_ptr<IState> MCTSAgent::get_best_solution() {
     }
     return node->get_state();
 }
+
+/*---------------------------------------------------------------------------*/
+std::shared_ptr<IState> MCTSAgent::get_best_child() {
+    const MCTSTree* node = m_tree;
+    if (!node->is_terminal() && node->has_children()){
+        node=node->get_most_visited_child();
+    }
+    return node->get_state();
+}
 /*---------------------------------------------------------------------------*/
 MCTSTree* MCTSAgent::select(MCTSTree* ANode) {
     MCTSTree *node = ANode;
