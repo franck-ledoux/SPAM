@@ -21,7 +21,8 @@ in file [main.cpp](mcts/inc/mcts/IState.h):
 auto s = std::make_shared<TakuzuState>();
 TakuzuRewardFunction reward_function;
 
-MCTSAgent agent(&reward_function, nb_mcts_iter);
+UCBSelectionFunction select_function;
+MCTSAgent agent(&reward_function, &select_function, nb_mcts_iter);
 
 MCTSLoop loop(agent, s, MCTSLoop::BEST_CHILD, nb_loop_iter, true);
 loop.run();
@@ -29,7 +30,8 @@ loop.run();
 In order to explain how our implemenation is working, let us give a few insights about those code lines:
 - The two first lines corresponds to initialize the implementation of the `IState` and `IRewarFunction` interfaces
 for the current example of Takuzu.
-- The third line initializes the agent that will progressively build and travers the MCTS tree. In particular, we give
+- The third line defines the selection function to use in the MCTS. Here UCB.
+- The fourth line initializes the agent that will progressively build and travers the MCTS tree. In particular, we give
 him the max number of iteration he will do in the classical MCTS loop process.
-- At the fourth line, an `MCTSLoop` object is created and it will the one that run the whole procedure 
+- Enventually, at the fifth line, an `MCTSLoop` object is created and it will the one that run the whole procedure 
 (see [here](../README.md)). 

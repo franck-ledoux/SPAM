@@ -2,8 +2,9 @@
 #include <iostream>
 #include "../inc/TakuzuRewardFunction.h"
 #include "../inc/TakuzuState.h"
-#include "mcts/MCTSAgent.h"
-#include "mcts/MCTSLoop.h"
+#include <mcts/MCTSAgent.h>
+#include <mcts/MCTSLoop.h>
+#include <mcts/MCTSSelectionFunction.h>
 /*---------------------------------------------------------------------------*/
 int main() {
     auto s = std::make_shared<TakuzuState>();
@@ -20,7 +21,8 @@ int main() {
     auto nb_loop_iter = 100;
     bool get_best_solution = false;
     TakuzuRewardFunction reward_function;
-    MCTSAgent agent(&reward_function, nb_mcts_iter);
+    UCBSelectionFunction select_function;
+    MCTSAgent agent(&reward_function, &select_function, nb_mcts_iter);
     agent.activate_debug_mode("takuzu", MCTSAgent::OUT_END_ONLY, 1000);
 
     MCTSLoop loop(agent, s, MCTSLoop::BEST_CHILD, nb_loop_iter, true);

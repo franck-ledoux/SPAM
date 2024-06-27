@@ -9,13 +9,14 @@
 /*---------------------------------------------------------------------------*/
 using json = nlohmann::json;
 /*---------------------------------------------------------------------------*/
-
 MCTSAgent::MCTSAgent(const IRewardFunction* ARewardFunction,
+                     const ISelectionFunction* ASelectFunction,
                      const int AMaxIterations,
                      const int AMaxSeconds,
                      const int AMaxSimulationDepth)
 : m_tree(nullptr),
   m_reward_function(ARewardFunction),
+  m_select_function(ASelectFunction),
   m_max_iterations(AMaxIterations),
   m_max_seconds(AMaxSeconds),
   m_simulation_depth(AMaxSimulationDepth),
@@ -28,41 +29,7 @@ MCTSAgent::MCTSAgent(const IRewardFunction* ARewardFunction,
 MCTSAgent::~MCTSAgent() {
     delete m_tree;
 }
-/*---------------------------------------------------------------------------*/
-void MCTSAgent::run(std::shared_ptr<IState> ARootState) {
-    //check that an existing tree was not used during a previous iteration
-    if(m_tree)
-        delete m_tree;
-    //Build the initial tree
-   m_tree  = new MCTSTree(ARootState);
 
-    int i=0;
-    auto time0 = std::chrono::steady_clock::now();
-    std::chrono::duration<double, std::ratio<1>> elapsed= std::chrono::steady_clock::now()-time0;
-
-    while (i<=m_max_iterations && elapsed.count() <= m_max_seconds){
-        // 1 SELECTION - we explore/exploit the existing tree to find a node to work on
-        auto node = select(m_tree);
-        // 2. EXPAND by adding a single child (if not terminal or not fully expanded)
-        node = expand(node);
-        // 3. SIMULATE (if not terminal)
-        auto reward = simulate(node);
-        // 4. BACK PROPAGATION
-        back_propagate(node,reward);
-        //increase loop counters
-        i++;
-        elapsed= std::chrono::steady_clock::now()-time0;
-        if(m_debug_activate && m_debug_mode==OUT_ITERATION){
-            if(i%m_debug_frequency==0)
-                export_tree();
-        }
-    }
-    m_nb_iterations=i;
-    m_nb_seconds =elapsed.count();
-    if (m_debug_activate && (m_debug_mode==OUT_END_ONLY || m_debug_mode==OUT_ITERATION)){
-        export_tree();
-    }
-}
 /*---------------------------------------------------------------------------*/
 std::shared_ptr<IState> MCTSAgent::get_best_solution() {
     const MCTSTree* node = m_tree;
@@ -73,22 +40,12 @@ std::shared_ptr<IState> MCTSAgent::get_best_solution() {
 }
 
 /*---------------------------------------------------------------------------*/
-std::shared_ptr<IState> MCTSAgent::get_best_child() {
+std::shared_ptr<IState> MCTSAgent::get_most_visited_child() {
     const MCTSTree* node = m_tree;
     if (!node->is_terminal() && node->has_children()){
         node=node->get_most_visited_child();
     }
     return node->get_state();
-}
-/*---------------------------------------------------------------------------*/
-MCTSTree* MCTSAgent::select(MCTSTree* ANode) {
-    MCTSTree *node = ANode;
-    while (node->is_fully_expanded() && !node->is_terminal()){
-        node = node->get_best_uct_child();
-    }
-    //We have reached a terminal node here
-    return  node;
-
 }
 /*---------------------------------------------------------------------------*/
 MCTSTree* MCTSAgent::expand(MCTSTree* ANode) {
@@ -184,3 +141,49 @@ void MCTSAgent::export_tree() {
     file.close();
     file_index++;
 }
+
+/*---------------------------------------------------------------------------*/
+void MCTSAgent::run(std::shared_ptr<IState> ARootState) {
+    //check that an existing tree was not used during a previous iteration
+    if(m_tree)
+        delete m_tree;
+    //Build the initial tree
+    m_tree  = new MCTSTree(ARootState);
+
+    int i=0;
+    auto time0 = std::chrono::steady_clock::now();
+    std::chrono::duration<double, std::ratio<1>> elapsed= std::chrono::steady_clock::now()-time0;
+
+    while (i<=m_max_iterations && elapsed.count() <= m_max_seconds){
+        // 1 SELECTION - we explore/exploit the existing tree to find a node to work on
+        auto node = select(m_tree);
+        // 2. EXPAND by adding a single child (if not terminal or not fully expanded)
+        node = expand(node);
+        // 3. SIMULATE (if not terminal)
+        auto reward = simulate(node);
+        // 4. BACK PROPAGATION
+        back_propagate(node,reward);
+        //increase loop counters
+        i++;
+        elapsed= std::chrono::steady_clock::now()-time0;
+        if(m_debug_activate && m_debug_mode==OUT_ITERATION){
+            if(i%m_debug_frequency==0)
+                export_tree();
+        }
+    }
+    m_nb_iterations=i;
+    m_nb_seconds =elapsed.count();
+    if (m_debug_activate && (m_debug_mode==OUT_END_ONLY || m_debug_mode==OUT_ITERATION)){
+        export_tree();
+    }
+}
+/*---------------------------------------------------------------------------*/
+MCTSTree* MCTSAgent::select(MCTSTree* ANode) {
+    MCTSTree *node = ANode;
+    while (node->is_fully_expanded() && !node->is_terminal()){
+        node = m_select_function->select(node);
+    }
+    //We have reached a terminal node here
+    return  node;
+}
+/*---------------------------------------------------------------------------*/

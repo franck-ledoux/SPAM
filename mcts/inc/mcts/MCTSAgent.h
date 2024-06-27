@@ -5,10 +5,11 @@
 #include <memory>
 #include <string>
 /*---------------------------------------------------------------------------*/
-#include "mcts/IState.h"
-#include "mcts/IAction.h"
-#include "mcts/IRewardFunction.h"
-#include "mcts/MCTSTree.h"
+#include <mcts/IState.h>
+#include <mcts/IAction.h>
+#include <mcts/IRewardFunction.h>
+#include <mcts/MCTSSelectionFunction.h>
+#include <mcts/MCTSTree.h>
 /*---------------------------------------------------------------------------*/
 class MCTSAgent {
 public:
@@ -22,13 +23,14 @@ public:
     };
 
     /**@brief Constructor
-     *
      * @param ARewardFunction reward function to evaluate a state
+     * @param ASelectFunction function to pick a child node during the selection process
      * @param AMaxIterations  max number of iterations
      * @param AMaxSeconds     max number seconds for the process
      * @param AMaxSimulationDepth max depth during the simulation stage
      */
     MCTSAgent(const IRewardFunction* ARewardFunction,
+              const ISelectionFunction* ASelectFunction,
               const int AMaxIterations=100000,
               const int AMaxSeconds=600,
               const int AMaxSimulationDepth=100);
@@ -68,7 +70,7 @@ public:
      *
      * @return the "best" root child
      */
-    std::shared_ptr<IState> get_best_child();
+    std::shared_ptr<IState> get_most_visited_child();
     /**@brief provides the number of iterations done by the algorithm
      */
     int get_nb_iterations() const {return m_nb_iterations;}
@@ -90,7 +92,7 @@ private:
      * @param[in] ANode the node we start the selection from
      * @return the selected node
      */
-    MCTSTree* select(MCTSTree* ANode);
+     MCTSTree* select(MCTSTree* ANode);
     /**@brief Simulation stage. This process returns an expected reward that is computed using a random
      * strategy to compute next stages.
      *
@@ -118,6 +120,9 @@ private:
     MCTSTree* m_tree;
     /** the reward function we use to evaluate each state */
     const IRewardFunction* m_reward_function;
+
+    /** the selection function we use to pick a child node during the selection stage*/
+    const ISelectionFunction* m_select_function;
     /** the max number of MCTS iterations that are performed*/
     const int m_max_iterations;
     /** the max number of seconds we accept to spend in the process*/
@@ -137,8 +142,6 @@ private:
     /** frequency in tuned mode*/
     int m_debug_frequency;
 };
-
-
 
 
 /*---------------------------------------------------------------------------*/
