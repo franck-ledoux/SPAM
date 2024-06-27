@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.20)
 project(spam VERSION 1.0.0 LANGUAGES CXX)
 #===============================================================================
 # Standard options
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 #===============================================================================
 # LIBRARIES ARE INSTALLED USING THE VERSION NUMBER OF OUR PROJECT
 set(PROJECT_INSTALL_NAME ${PROJECT_NAME}-${PROJECT_VERSION})

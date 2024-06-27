@@ -3,6 +3,7 @@
 #define MATCHING_MCTSLOOP_H
 /*---------------------------------------------------------------------------*/
 #include <memory>
+#include <iostream>
 /*---------------------------------------------------------------------------*/
 #include "mcts/IState.h"
 #include "mcts/IAction.h"
@@ -45,8 +46,7 @@ public:
      */
     int get_nb_iterations() const {return m_nb_iterations;}
 
-    /**@brief Gives access to the used agent
-     */
+    /**@brief Gives access to the used agent */
     MCTSAgent& get_agent() const {return m_agent;}
 
 private:
@@ -63,6 +63,7 @@ private:
     /** display info or not on the std::cout stream */
     bool m_display_info;
 };
+
 /*---------------------------------------------------------------------------*/
 #endif //MATCHING_MCTLOOP_H
 /*---------------------------------------------------------------------------*/

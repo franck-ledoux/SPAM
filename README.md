@@ -24,7 +24,7 @@ using SPAM, you do not need to look at the **MCSTree** class. On its side, the *
 ![MCTS_pipeline](doc/mcts.png "MCTS picture")
 
 When instantiating an **MCTSAgent** agent, we must give it the reward function that 
-will be used during the process, but also the maximum number of iterations we accept, and the
+will be used during the process, but also the selection function (here UCB is provided), the maximum number of iterations we accept, and the
 maximun number of seconds.
 
 The other important class is **MCTSLoop**. Its role is to integrate the MCTS pipeline execution 

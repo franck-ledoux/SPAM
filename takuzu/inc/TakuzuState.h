@@ -25,10 +25,11 @@ public:
 
     bool  win() const override;
 
-    void write(const std::string& AFileName,
+    std::string write(const std::string& AFileName,
                const int AStageIndex,
                const int ANodeId,
                const int ADepth) const override;
+
     bool  lost() const;
 
     friend std::ostream& operator<<(std::ostream& os, const TakuzuState& TS);
