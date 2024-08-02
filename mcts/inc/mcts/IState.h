@@ -14,12 +14,6 @@ public:
      */
     virtual std::vector<std::shared_ptr<IAction> > get_actions() const = 0;
 
-    /**@brief Computes the state reach from the current one when applying @p AAction
-     * @param[in] AAction the action to apply
-     * @return the state that is built from this one when applying @p AAction
-     */
-    virtual std::shared_ptr<IState> apply(std::shared_ptr<IAction> AAction) const = 0;
-
     /**@brief Indicates if the concrete state is terminal (win or lost in classical games)
      * @return true if it is terminal, false otherwise
      */

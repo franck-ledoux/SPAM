@@ -34,14 +34,6 @@ std::vector<std::shared_ptr<IAction>> TakuzuState::get_actions() const
     return actions;
 }
 /*---------------------------------------------------------------------------*/
-std::shared_ptr<IState> TakuzuState::
-apply(const std::shared_ptr<IAction> AAction) const {
-    auto next_state = std::make_shared<TakuzuState>(*this);
-    auto a = std::dynamic_pointer_cast<TakuzuAction>(AAction);
-    next_state->board[a->i][a->j]=a->value;
-    return next_state;
-}
-/*---------------------------------------------------------------------------*/
 bool TakuzuState::lost() const {
     //the state is lost if a rule is violated (then it loses)
 
