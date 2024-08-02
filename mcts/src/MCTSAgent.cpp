@@ -66,7 +66,7 @@ double MCTSAgent::simulate(MCTSTree* ANode) {
         for (int d = 0; d < m_simulation_depth; d++) {
             if (!state->is_terminal()) {
                 auto a = get_random_action(state);
-                state = state->apply(a);
+                state = a->apply_on(state);
             }
         }
     }

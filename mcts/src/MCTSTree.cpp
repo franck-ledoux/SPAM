@@ -98,7 +98,7 @@ MCTSTree*  MCTSTree::expand()  {
 // create a clone of the current state, apply action, and add as child
 MCTSTree*  MCTSTree::add_child_with_action(std::shared_ptr<IAction> AAction) {
     // create a new TreeNode with the same state (will get cloned) as this TreeNode
-    auto next_state = m_state->apply(AAction);
+    auto next_state = AAction->apply_on(m_state);
 
     MCTSTree* child_node = new MCTSTree(next_state, AAction, this);
 

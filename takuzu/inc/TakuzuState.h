@@ -15,12 +15,6 @@ public:
 
     std::vector<std::shared_ptr<IAction>> get_actions() const override;
 
-    /**@brief Computes the state reach from the current one when applying @p AAction
-     * @param AAction the action to apply
-     * @return the state that is built from this one when applying @p AAction
-     */
-    std::shared_ptr<IState> apply(std::shared_ptr<IAction>  AAction) const override;
-
     bool is_terminal() const override;
 
     bool  win() const override;
